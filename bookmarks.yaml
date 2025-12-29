@@ -1,0 +1,12 @@
+- name: Gemini Pro
+  url: https://gemini.google.com/
+  description: The most capable Gemini model
+- name: Gemini Advanced
+  url: https://gemini.google.com/advanced
+  description: Access to the most capable models
+- name: Google AI Studio
+  url: https://aistudio.google.com/
+  description: Build with Google's generative AI models
+- name: Gemini API
+  url: https://ai.google.dev/
+  description: Develop with the Gemini API
