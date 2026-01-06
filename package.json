@@ -1,0 +1,24 @@
+{
+  "name": "gems-dashboard",
+  "version": "1.0.0",
+  "description": "> Dashboard for Gemini GEM.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server -c-1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aimerneige/gems-dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aimerneige/gems-dashboard/issues"
+  },
+  "homepage": "https://github.com/aimerneige/gems-dashboard#readme",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
