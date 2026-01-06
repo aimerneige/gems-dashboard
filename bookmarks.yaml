@@ -1,36 +1,48 @@
 - name: 日语学习助手
   url: https://gemini.google.com/gem/683ec61a335f
+  icon: https://via.placeholder.com/100
   description:  协助用户学习日语知识
 - name: 四格漫画分镜师
   url: https://gemini.google.com/gem/4a15d4f9becc
+  icon: https://via.placeholder.com/100
   description: 专业的漫画师，可以合理安排故事情节，设计漫画分镜
 - name: LoveLive! 四格漫画绘师
   url: https://gemini.google.com/gem/55cee6d3d5df
+  icon: https://via.placeholder.com/100
   description: 专注于生成 Sunrise 风格的 LoveLive! 竖向四格漫画
 - name: Oreimo 四格漫画绘师
   url: https://gemini.google.com/gem/975af9b2b52b
+  icon: https://via.placeholder.com/100
   description: 识别用户提供的分镜脚本并完成 Oreimo 主题的四格漫画的创作
 - name: 发糖漫画编剧
   url: https://gemini.google.com/gem/2713ddac0c6f
+  icon: https://via.placeholder.com/100
   description: 给出动漫和角色，自动生成日常的温馨互动剧情
 - name: LoveLive 动画总督
   url: https://gemini.google.com/gem/57089cafc478
+  icon: https://via.placeholder.com/100
   description: 输入 LoveLive 剧情脚本，返回修改建议
 - name: 资深连载四格漫画分镜导演
   url: https://gemini.google.com/gem/f1359db13e82
+  icon: https://via.placeholder.com/100
   description: 给出中短篇故事剧情，完成分镜任务
 - name: 冲突风四格漫画编剧
   url: https://gemini.google.com/gem/1ef85c30a7cc
+  icon: https://via.placeholder.com/100
   description: 根据给定的动漫角色，创作带有冲突的日常剧情
 - name: 提示词优化大师
   url: https://gemini.google.com/gem/aa9d4219a7fe
+  icon: https://via.placeholder.com/100
   description: 针对用户给出的提示词，按照谷歌官方的提示词工程指南进行修改
 - name: Q 版 3D 漫画绘师
   url: https://gemini.google.com/gem/8ed9220d8371
+  icon: https://via.placeholder.com/100
   description: 接受用户的分镜脚本，生成可爱的 Q 版 3D 漫画
 - name: BJD 模型漫画师 (LoveLive)
   url: https://gemini.google.com/gem/5717ae61d6e1
+  icon: https://via.placeholder.com/100
   description:  输入四格漫画分镜脚本，生成实拍 bjd 玩偶的漫画
 - name: 像素风格绘师(LoveLive)
   url: https://gemini.google.com/gem/b7452ccc25c5
+  icon: https://via.placeholder.com/100
   description: 接受用户的风镜脚本，完成像素风格的漫画
