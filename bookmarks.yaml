@@ -46,3 +46,11 @@
   url: https://gemini.google.com/gem/b7452ccc25c5
   icon: https://via.placeholder.com/100
   description: 接受用户的风镜脚本，完成像素风格的漫画
+- name: 图像生成提示词专家
+  url: https://gemini.google.com/gem/2a74f4afac2f
+  icon: https://via.placeholder.com/100
+  description: 将用户的提示词优化为符合 Gemini 2.5 Flash Image Generation 模型最佳实践的提示词
+- name: LoveLive Figma 专精微距摄影导演
+  url: https://gemini.google.com/gem/ff5dbb71d432
+  icon: https://via.placeholder.com/100
+  description: 接受漫画分镜脚本，完成 figma 风格的漫画。
