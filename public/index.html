@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="acid">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,65 +7,78 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
+    <div class="marquee">
+        <span>SYSTEM ONLINE // GEM DASHBOARD // MANAGE YOUR GEMS // TAMPERMONKEY SYNC READY //</span>
+    </div>
+
     <header>
-        <div class="header-content">
-            <h1>GEM Dashboard</h1>
-            <p class="subtitle">Manage your Gemini Gems in one place</p>
+        <h1>GEM DASHBOARD_</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span class="header-status">[ STATUS: ONLINE ]</span>
+            <div class="theme-switcher">
+                <button class="theme-btn" data-theme="acid">ACID</button>
+                <button class="theme-btn" data-theme="anime">ANIME</button>
+                <button class="theme-btn" data-theme="minimal">MINIMAL</button>
+            </div>
         </div>
-        <button class="btn btn-primary" id="sync-btn">
-            <span class="btn-icon">⟳</span>
-            Sync from Gemini
-        </button>
     </header>
 
-    <main>
-        <div id="gem-container" class="gem-grid"></div>
-        <div id="empty-state" class="empty-state" style="display: none;">
-            <div class="empty-icon">💎</div>
-            <h2>No Gems Found</h2>
-            <p>Click "Sync from Gemini" to import your gems, or use the Tampermonkey script.</p>
-        </div>
-    </main>
+    <div class="container">
+        <button class="btn" id="sync-btn" style="margin-bottom: 2rem;">
+            <span class="btn-icon">⟳</span>
+            SYNC FROM GEMINI
+        </button>
+
+        <main>
+            <div id="gem-container" class="gem-grid"></div>
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-icon">💎</div>
+                <h2>NO GEMS FOUND</h2>
+                <p>Click "SYNC FROM GEMINI" to import your gems, or use the Tampermonkey script.</p>
+            </div>
+        </main>
+    </div>
 
     <div id="toast" class="toast"></div>
 
     <div id="modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modal-title">Edit GEM</h2>
+                <h2 id="modal-title">> EDIT_GEM</h2>
                 <button class="modal-close" id="modal-close">×</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="gem-id">
                 <div class="form-group">
-                    <label for="gem-name">Name</label>
-                    <input type="text" id="gem-name" placeholder="GEM name">
+                    <label for="gem-name">GEM_NAME</label>
+                    <input type="text" id="gem-name" placeholder="Enter gem name...">
                 </div>
                 <div class="form-group">
-                    <label for="gem-url">URL</label>
+                    <label for="gem-url">GEM_URL</label>
                     <input type="url" id="gem-url" placeholder="https://gemini.google.com/gem/...">
                 </div>
                 <div class="form-group">
-                    <label for="gem-description">Description</label>
-                    <textarea id="gem-description" placeholder="GEM description"></textarea>
+                    <label for="gem-description">DESCRIPTION</label>
+                    <textarea id="gem-description" placeholder="Gem description..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Icon</label>
+                    <label>ICON_DATA</label>
                     <div class="icon-upload">
                         <div id="icon-preview" class="icon-preview">
-                            <span class="placeholder-text">No icon</span>
+                            <span class="placeholder-text">NO_ICON</span>
                         </div>
                         <input type="file" id="icon-input" accept="image/*" style="display: none;">
                         <div class="icon-actions">
-                            <button type="button" class="btn btn-secondary" id="upload-btn">Upload</button>
-                            <button type="button" class="btn btn-danger" id="remove-icon-btn" style="display: none;">Remove</button>
+                            <button type="button" class="btn btn-secondary" id="upload-btn">UPLOAD</button>
+                            <button type="button" class="btn btn-danger" id="remove-icon-btn" style="display: none;">REMOVE</button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancel-btn">Cancel</button>
-                <button class="btn btn-primary" id="save-btn">Save</button>
+                <button class="btn btn-secondary" id="cancel-btn">CANCEL</button>
+                <button class="btn" id="save-btn">SAVE_DATA</button>
             </div>
         </div>
     </div>

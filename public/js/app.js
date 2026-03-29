@@ -5,6 +5,8 @@ const COLORS = [
     '#eab308', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6'
 ];
 
+const THEME_KEY = 'gem-dashboard-theme';
+
 let gems = [];
 let editingGem = null;
 let uploadedFile = null;
@@ -22,6 +24,29 @@ document.getElementById('upload-btn').addEventListener('click', () => document.g
 document.getElementById('icon-input').addEventListener('change', handleIconUpload);
 document.getElementById('remove-icon-btn').addEventListener('click', removeIcon);
 modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const theme = btn.dataset.theme;
+        setTheme(theme);
+        localStorage.setItem(THEME_KEY, theme);
+    });
+});
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+}
+
+function getStoredTheme() {
+    return localStorage.getItem(THEME_KEY);
+}
+
+function initTheme() {
+    const stored = getStoredTheme();
+    if (stored) {
+        setTheme(stored);
+    }
+}
 
 async function loadGems() {
     try {
@@ -71,7 +96,7 @@ function createGemCard(gem) {
         : `<span>${gem.name.charAt(0).toUpperCase()}</span>`;
 
     return `
-        <div class="gem-card" data-url="${gem.url}" data-id="${gem.id}">
+        <div class="gem-card" data-url="${gem.url}" data-id="${gem.id}" data-panel="${gem.name.substring(0, 10).toUpperCase()}">
             <div class="gem-actions">
                 <button class="gem-action-btn edit-btn" data-id="${gem.id}" title="Edit">✎</button>
                 <button class="gem-action-btn delete-btn" data-id="${gem.id}" title="Delete">×</button>
@@ -115,7 +140,7 @@ function openEditModal(id) {
     editingGem = gems.find(g => g.id === id);
     if (!editingGem) return;
 
-    document.getElementById('modal-title').textContent = 'Edit GEM';
+    document.getElementById('modal-title').textContent = '> EDIT_GEM';
     document.getElementById('gem-id').value = editingGem.id;
     document.getElementById('gem-name').value = editingGem.name;
     document.getElementById('gem-url').value = editingGem.url;
@@ -126,7 +151,7 @@ function openEditModal(id) {
         preview.innerHTML = `<img src="${editingGem.icon}" alt="icon">`;
         document.getElementById('remove-icon-btn').style.display = 'block';
     } else {
-        preview.innerHTML = `<span class="placeholder-text">No icon</span>`;
+        preview.innerHTML = `<span class="placeholder-text">NO_ICON</span>`;
         document.getElementById('remove-icon-btn').style.display = 'none';
     }
     uploadedFile = null;
@@ -160,7 +185,7 @@ function removeIcon() {
         preview.innerHTML = `<img src="${editingGem.icon}" alt="icon">`;
         document.getElementById('remove-icon-btn').style.display = 'block';
     } else {
-        preview.innerHTML = `<span class="placeholder-text">No icon</span>`;
+        preview.innerHTML = `<span class="placeholder-text">NO_ICON</span>`;
         document.getElementById('remove-icon-btn').style.display = 'none';
     }
 }
@@ -225,4 +250,5 @@ function showToast(message, type = 'info') {
     setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+initTheme();
 loadGems();
