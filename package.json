@@ -1,23 +1,29 @@
 {
   "name": "gems-dashboard",
-  "version": "1.0.0",
-  "description": "> Dashboard for Gemini GEM.",
-  "main": "script.js",
+  "version": "2.0.0",
+  "description": "Dashboard for Gemini GEM with Tampermonkey sync support",
+  "main": "server/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "http-server -c-1"
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aimerneige/gems-dashboard.git"
   },
-  "keywords": [],
+  "keywords": ["gemini", "gem", "dashboard", "tampermonkey"],
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/aimerneige/gems-dashboard/issues"
   },
   "homepage": "https://github.com/aimerneige/gems-dashboard#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "js-yaml": "^4.1.0",
+    "multer": "^1.4.5-lts.1"
+  },
   "devDependencies": {
     "http-server": "^14.1.1"
   }
