@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Gemini GEM Fetcher
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.2
 // @description  Fetch GEMs from Gemini website and sync to dashboard
 // @author       Your Name
 // @match        https://gemini.google.com/*
 // @grant        GM_xmlhttpRequest
+// @grant        GM_log
 // @connect      localhost
 // @connect      127.0.0.1
 // @run-at       document-idle
@@ -16,10 +17,6 @@
 
     const API_ENDPOINT = 'http://localhost:3000/api/gems/batch';
 
-    const GEM_MODAL_SELECTOR = '[data-testid="gem-modal"], .modal, [role="dialog"]';
-    const GEM_CARD_SELECTOR = '[data-testid="gem-card"], [data-gem-item], .gem-item';
-
-    let fetchedGems = [];
     let isSyncing = false;
 
     function extractGemId(url) {
@@ -27,111 +24,61 @@
         return match ? match[1] : null;
     }
 
-    function extractGemsFromPage() {
+    function log(msg) {
+        console.log('[GEM Fetcher]', msg);
+    }
+
+    function extractGemsFromDOM() {
         const gems = [];
+        const seenIds = new Set();
 
-        const gemElements = document.querySelectorAll(GEM_CARD_SELECTOR);
-        gemElements.forEach(el => {
-            const linkEl = el.querySelector('a[href*="/gem/"]');
-            const nameEl = el.querySelector('h1, h2, h3, [data-testid="gem-name"], .gem-name');
-            const descEl = el.querySelector('p, [data-testid="gem-description"], .gem-description');
-            const imgEl = el.querySelector('img[src*="gemini"], img[src*="google"], .gem-icon img');
+        const gemLinks = document.querySelectorAll('a.bot-row[href*="/gem/"]');
+        log(`Found ${gemLinks.length} gem links`);
 
-            if (linkEl) {
-                const url = linkEl.href;
-                const id = extractGemId(url);
-                if (id) {
-                    gems.push({
-                        id: id,
-                        name: nameEl ? nameEl.textContent.trim() : 'Unnamed GEM',
-                        url: url,
-                        description: descEl ? descEl.textContent.trim() : '',
-                        icon: imgEl ? imgEl.src : null
-                    });
+        gemLinks.forEach(link => {
+            const url = link.href;
+            const id = extractGemId(url);
+            if (!id || seenIds.has(id)) return;
+            seenIds.add(id);
+
+            const titleEl = link.querySelector('.gds-title-m.title');
+            const descEl = link.querySelector('.bot-desc');
+            const logoEl = link.querySelector('bot-logo');
+
+            let name = 'Unnamed GEM';
+            let description = '';
+            let color = null;
+
+            if (titleEl) {
+                name = titleEl.textContent.trim();
+            }
+
+            if (descEl) {
+                description = descEl.textContent.trim();
+            }
+
+            if (logoEl) {
+                const style = logoEl.getAttribute('style') || '';
+                const bgMatch = style.match(/--bot-logo-bg:\s*([^;]+)/);
+                const textMatch = style.match(/--bot-logo-text:\s*([^;]+)/);
+                if (bgMatch) {
+                    color = bgMatch[1].trim();
                 }
             }
-        });
 
-        const detailMatch = window.location.href.match(/\/gem\/([a-zA-Z0-9]+)/);
-        if (detailMatch) {
-            const id = detailMatch[1];
-            const nameEl = document.querySelector('h1, [data-testid="gem-title"]');
-            const descEl = document.querySelector('[data-testid="gem-description"], .description');
-            const imgEl = document.querySelector('[data-testid="gem-image"], .gem-image img, header img');
-
-            const gem = {
+            gems.push({
                 id: id,
-                name: nameEl ? nameEl.textContent.trim() : document.title.replace(' - Gemini', '').trim(),
-                url: window.location.href,
-                description: descEl ? descEl.textContent.trim() : ''
-            };
-
-            if (imgEl && imgEl.src) {
-                gem.icon = imgEl.src;
-            }
-
-            const existing = gems.find(g => g.id === id);
-            if (!existing) {
-                gems.push(gem);
-            }
-        }
-
-        return gems;
-    }
-
-    function findGemsInAST() {
-        const gems = [];
-        const scripts = document.querySelectorAll('script[type="application/json"], script[id*="init"]');
-
-        scripts.forEach(script => {
-            try {
-                let data;
-                if (script.tagName === 'SCRIPT' && script.type === 'application/json') {
-                    data = JSON.parse(script.textContent);
-                }
-
-                if (data && typeof data === 'object') {
-                    traverseObject(data, gems);
-                }
-            } catch (e) {}
+                name: name,
+                url: `https://gemini.google.com/gem/${id}`,
+                description: description,
+                color: color
+            });
         });
 
         return gems;
     }
 
-    function traverseObject(obj, gems, depth = 0) {
-        if (depth > 10 || !obj) return;
-
-        if (Array.isArray(obj)) {
-            obj.forEach(item => traverseObject(item, gems, depth + 1));
-            return;
-        }
-
-        if (typeof obj === 'object') {
-            if (obj.url && obj.id && obj.name && obj.url.includes('/gem/')) {
-                const gem = {
-                    id: obj.id,
-                    name: obj.name,
-                    url: obj.url,
-                    description: obj.description || ''
-                };
-                if (obj.image || obj.icon || obj.avatar) {
-                    gem.icon = obj.image || obj.icon || obj.avatar;
-                }
-                if (!gems.find(g => g.id === gem.id)) {
-                    gems.push(gem);
-                }
-            }
-
-            for (const key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    traverseObject(obj[key], gems, depth + 1);
-                }
-            }
-        }
-    }
-
-    function syncGemsToServer(gems) {
+    async function syncGemsToServer(gems) {
         return new Promise((resolve, reject) => {
             GM_xmlhttpRequest({
                 method: 'POST',
@@ -159,7 +106,8 @@
         const colors = {
             success: '#22c55e',
             error: '#ef4444',
-            info: '#6366f1'
+            info: '#6366f1',
+            warning: '#f59e0b'
         };
 
         const notification = document.createElement('div');
@@ -168,7 +116,7 @@
             top: 20px;
             right: 20px;
             padding: 12px 24px;
-            background: ${colors[type]};
+            background: ${colors[type] || colors.info};
             color: white;
             border-radius: 8px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -176,6 +124,7 @@
             z-index: 999999;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             animation: slideIn 0.3s ease;
+            max-width: 300px;
         `;
         notification.textContent = message;
 
@@ -195,7 +144,7 @@
                 notification.remove();
                 style.remove();
             }, 300);
-        }, 3000);
+        }, 4000);
     }
 
     async function performSync() {
@@ -205,14 +154,11 @@
         showNotification('Syncing GEMS...', 'info');
 
         try {
-            let gems = extractGemsFromPage();
+            const gems = extractGemsFromDOM();
+            log(`Found ${gems.length} gems`);
 
             if (gems.length === 0) {
-                gems = findGemsInAST();
-            }
-
-            if (gems.length === 0) {
-                showNotification('No GEMS found on this page', 'error');
+                showNotification('No GEMS found. Make sure you are on the GEMS list page.', 'warning');
                 isSyncing = false;
                 return;
             }
@@ -220,7 +166,7 @@
             await syncGemsToServer(gems);
             showNotification(`Synced ${gems.length} GEMS successfully!`, 'success');
         } catch (error) {
-            console.error('Sync error:', error);
+            log(`Sync error: ${error.message}`);
             showNotification('Sync failed: ' + error.message, 'error');
         } finally {
             isSyncing = false;
@@ -228,6 +174,8 @@
     }
 
     function createSyncButton() {
+        if (document.getElementById('gem-sync-button')) return;
+
         const button = document.createElement('button');
         button.id = 'gem-sync-button';
         button.textContent = '⟳ Sync GEMS';
@@ -262,30 +210,29 @@
         button.addEventListener('click', performSync);
 
         document.body.appendChild(button);
+        log('Sync button created');
     }
 
     function init() {
+        log('GEM Fetcher initialized');
+        log(`Current URL: ${window.location.href}`);
+
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', createSyncButton);
         } else {
             createSyncButton();
         }
 
-        let debounceTimer;
+        let lastUrl = window.location.href;
         const observer = new MutationObserver(() => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                const newGems = extractGemsFromPage();
-                if (newGems.length > fetchedGems.length) {
-                    fetchedGems = newGems;
-                }
-            }, 1000);
+            if (window.location.href !== lastUrl) {
+                lastUrl = window.location.href;
+                log(`URL changed to: ${window.location.href}`);
+                setTimeout(createSyncButton, 2000);
+            }
         });
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
+        observer.observe(document.body, { childList: true, subtree: true });
     }
 
     init();
