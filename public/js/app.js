@@ -1,15 +1,15 @@
 const API_BASE = '/api';
 
-const COLORS = [
-    '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316',
-    '#eab308', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6'
-];
+const THEME_COLORS = {
+    acid: ['#ccff00', '#ff00cc', '#00ffff', '#e0e0e0'],
+    anime: ['#ff5e94', '#00d2ff', '#ffee58', '#ff74a4'],
+    minimal: ['#2563eb', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316']
+};
 
 const THEME_KEY = 'gem-dashboard-theme';
 
 let gems = [];
 let editingGem = null;
-let uploadedFile = null;
 
 const gemContainer = document.getElementById('gem-container');
 const emptyState = document.getElementById('empty-state');
@@ -20,9 +20,6 @@ document.getElementById('sync-btn').addEventListener('click', syncFromGemini);
 document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('cancel-btn').addEventListener('click', closeModal);
 document.getElementById('save-btn').addEventListener('click', saveGem);
-document.getElementById('upload-btn').addEventListener('click', () => document.getElementById('icon-input').click());
-document.getElementById('icon-input').addEventListener('change', handleIconUpload);
-document.getElementById('remove-icon-btn').addEventListener('click', removeIcon);
 modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
 document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -48,6 +45,12 @@ function initTheme() {
     }
 }
 
+function getThemeColor(index) {
+    const theme = document.documentElement.getAttribute('data-theme') || 'acid';
+    const colors = THEME_COLORS[theme] || THEME_COLORS.acid;
+    return colors[index % colors.length];
+}
+
 async function loadGems() {
     try {
         const res = await fetch(`${API_BASE}/gems`);
@@ -68,7 +71,7 @@ function renderGems() {
         return;
     }
     emptyState.style.display = 'none';
-    gemContainer.innerHTML = gems.map(gem => createGemCard(gem)).join('');
+    gemContainer.innerHTML = gems.map((gem, index) => createGemCard(gem, index)).join('');
     document.querySelectorAll('.gem-card').forEach(card => {
         card.addEventListener('click', (e) => {
             if (e.target.closest('.gem-action-btn')) return;
@@ -89,11 +92,9 @@ function renderGems() {
     });
 }
 
-function createGemCard(gem) {
-    const color = gem.color || COLORS[Math.floor(Math.random() * COLORS.length)];
-    const iconHtml = gem.icon
-        ? `<img src="${gem.icon}" alt="${gem.name}">`
-        : `<span>${gem.name.charAt(0).toUpperCase()}</span>`;
+function createGemCard(gem, index) {
+    const color = getThemeColor(index);
+    const initial = gem.name.charAt(0).toUpperCase();
 
     return `
         <div class="gem-card" data-url="${gem.url}" data-id="${gem.id}" data-panel="${gem.name.substring(0, 10).toUpperCase()}">
@@ -103,7 +104,7 @@ function createGemCard(gem) {
             </div>
             <div class="gem-card-header">
                 <div class="gem-icon-wrapper" style="background-color: ${color}">
-                    ${iconHtml}
+                    <span>${initial}</span>
                 </div>
                 <div class="gem-info">
                     <h3 class="gem-name">${gem.name}</h3>
@@ -146,48 +147,12 @@ function openEditModal(id) {
     document.getElementById('gem-url').value = editingGem.url;
     document.getElementById('gem-description').value = editingGem.description || '';
 
-    const preview = document.getElementById('icon-preview');
-    if (editingGem.icon) {
-        preview.innerHTML = `<img src="${editingGem.icon}" alt="icon">`;
-        document.getElementById('remove-icon-btn').style.display = 'block';
-    } else {
-        preview.innerHTML = `<span class="placeholder-text">NO_ICON</span>`;
-        document.getElementById('remove-icon-btn').style.display = 'none';
-    }
-    uploadedFile = null;
     modal.classList.add('show');
 }
 
 function closeModal() {
     modal.classList.remove('show');
     editingGem = null;
-    uploadedFile = null;
-}
-
-function handleIconUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    uploadedFile = file;
-    const preview = document.getElementById('icon-preview');
-    const reader = new FileReader();
-    reader.onload = () => {
-        preview.innerHTML = `<img src="${reader.result}" alt="icon">`;
-    };
-    reader.readAsDataURL(file);
-    document.getElementById('remove-icon-btn').style.display = 'block';
-}
-
-function removeIcon() {
-    uploadedFile = null;
-    document.getElementById('icon-input').value = '';
-    const preview = document.getElementById('icon-preview');
-    if (editingGem && editingGem.icon) {
-        preview.innerHTML = `<img src="${editingGem.icon}" alt="icon">`;
-        document.getElementById('remove-icon-btn').style.display = 'block';
-    } else {
-        preview.innerHTML = `<span class="placeholder-text">NO_ICON</span>`;
-        document.getElementById('remove-icon-btn').style.display = 'none';
-    }
 }
 
 async function saveGem() {
@@ -210,14 +175,6 @@ async function saveGem() {
         });
         const data = await res.json();
         if (data.success) {
-            if (uploadedFile) {
-                const formData = new FormData();
-                formData.append('image', uploadedFile);
-                await fetch(`${API_BASE}/upload/${id}`, {
-                    method: 'POST',
-                    body: formData
-                });
-            }
             await loadGems();
             closeModal();
             showToast('GEM updated', 'success');

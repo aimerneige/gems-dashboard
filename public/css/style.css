@@ -388,12 +388,6 @@ header h1 {
     border-color: var(--border-color);
     color: white;
 }
-.gem-icon-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: var(--radius);
-}
 .gem-info {
     flex: 1;
     min-width: 0;
@@ -719,45 +713,6 @@ header h1 {
 .form-group textarea {
     resize: vertical;
     min-height: 80px;
-}
-
-.icon-upload {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-.icon-preview {
-    width: 80px;
-    height: 80px;
-    border: 2px dashed var(--neon-cyan, var(--border-color));
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: var(--radius);
-}
-[data-theme="anime"] .icon-preview {
-    border-radius: 12px;
-    border: 3px solid var(--border-color);
-}
-.placeholder-text {
-    color: #666;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-}
-[data-theme="minimal"] .placeholder-text {
-    font-size: 0.8rem;
-}
-.icon-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.icon-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
 }
 
 @media (max-width: 768px) {
